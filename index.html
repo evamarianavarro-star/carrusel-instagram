@@ -391,29 +391,36 @@
     estado.classList.add('visible');
     estado.textContent = 'Analizando el texto y distribuyendo el contenido…';
 
-    const prompt = `Eres un asistente que convierte textos reflexivos en carruseles de Instagram de 6 diapositivas.
+    const prompt = `Eres un asistente que convierte textos reflexivos en carruseles de Instagram.
 
-El formato de cada post sigue siempre esta estructura narrativa:
-- Slide 01 (PORTADA): título del post, categoría "Amor en lo cotidiano", y un subtítulo de 2 líneas cortas que inviten a leer.
-- Slide 02 (LA ESCENA): inicio del relato, sitúa al lector en la situación cotidiana.
-- Slide 03 (EL GIRO): el momento de sorpresa o expectativa rota. Si hay una frase entre comillas o un pensamiento, ponla como cita.
-- Slide 04 (EL DETALLE): el momento concreto y bello. Si hay una lista de elementos, mantenla como lista.
-- Slide 05 (LA REFLEXIÓN): la frase más poderosa del texto, como cita centrada. Solo esta frase, sin más texto.
-- Slide 06 (EL CIERRE): la conclusión espiritual o reflexiva, más los hashtags relevantes al tema.
+REGLA MÁS IMPORTANTE: No suprimas, resumas ni recortes NADA del texto original. Todo el contenido debe aparecer en las slides, distribuido con naturalidad.
+
+El número de slides es flexible según la longitud del texto:
+- Textos cortos: 6 slides
+- Textos medios: 7-8 slides
+- Textos largos: 9-10 slides
+
+La estructura narrativa siempre sigue este orden:
+- Primera slide (PORTADA): título, categoría "Amor en lo cotidiano", subtítulo de 2 líneas.
+- Slides intermedias: distribuye TODO el texto en bloques naturales. Cada slide tiene un solo tema o momento. Si hay citas o frases entre comillas, ponlas como cita. Si hay listas, mantenlas como lista.
+- Penúltima slide (LA REFLEXIÓN): la frase más poderosa, sola, como cita centrada.
+- Última slide (EL CIERRE): conclusión espiritual o reflexiva + hashtags.
 
 Título: "${titulo}"
 
 Texto completo:
 ${texto}
 
-Devuelve ÚNICAMENTE un objeto JSON válido, sin markdown, sin explicaciones, con esta estructura exacta:
+Devuelve ÚNICAMENTE un objeto JSON válido, sin markdown, sin explicaciones, con esta estructura:
 {
-  "s01": { "tag": "Amor en lo cotidiano", "titulo": "...", "subtitulo": "línea 1\nlínea 2" },
-  "s02": { "parrafos": ["párrafo 1", "párrafo 2", "párrafo 3"] },
-  "s03": { "intro": "texto antes de la cita", "cita": "frase entre comillas si la hay", "outro": ["párrafo final"] },
-  "s04": { "intro": ["párrafo 1", "párrafo 2"], "lista": ["item 1", "item 2", "item 3"], "outro": ["párrafo final"] },
-  "s05": { "cita": "la frase más poderosa y breve del texto, reescrita si hace falta para máximo impacto" },
-  "s06": { "parrafos": ["párrafo 1", "párrafo 2", "párrafo 3", "frase final en cursiva"], "hashtags": "#Tag1 · #Tag2 · #Tag3" }
+  "slides": [
+    { "tipo": "portada", "tag": "Amor en lo cotidiano", "titulo": "...", "subtitulo": "línea 1\nlínea 2" },
+    { "tipo": "cuerpo", "parrafos": ["párrafo 1", "párrafo 2"] },
+    { "tipo": "cita", "intro": "texto antes de la cita", "cita": "la cita", "outro": ["texto después"] },
+    { "tipo": "lista", "intro": ["párrafo intro"], "lista": ["item 1", "item 2"], "outro": ["párrafo final"] },
+    { "tipo": "reflexion", "cita": "frase poderosa" },
+    { "tipo": "cierre", "parrafos": ["párrafo 1", "párrafo 2", "frase final en cursiva"], "hashtags": "#Tag1 · #Tag2 · #Tag3" }
+  ]
 }`;
 
     try {
