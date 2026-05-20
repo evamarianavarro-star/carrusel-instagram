@@ -451,78 +451,87 @@ Devuelve ÚNICAMENTE un objeto JSON válido, sin markdown, sin explicaciones, co
     btn.disabled = false;
   }
 
-  function renderSlides(s, titulo, usuario) {
+ function renderSlides(s, titulo, usuario) {
     const zona = document.getElementById('slides-zona');
     zona.innerHTML = '';
     const marca = `<div class="slide-marca">${usuario}</div>`;
+    const slides = s.slides || [];
 
-    zona.innerHTML += `
-      <div class="slide-label">Diapositiva 01 — Portada</div>
-      <div class="slide">
-        <div class="tag" contenteditable="true" data-editable>${s.s01.tag}</div>
-        <div class="titulo-grande" contenteditable="true" data-editable>${s.s01.titulo}</div>
-        <div class="divider"></div>
-        <div class="subtitulo" contenteditable="true" data-editable>${s.s01.subtitulo.replace(/\n/g,'<br>')}</div>
-        <div class="slide-num">01</div>${marca}
-      </div>`;
+    slides.forEach((slide, i) => {
+      const num = String(i + 1).padStart(2, '0');
+      const label = `<div class="slide-label">Diapositiva ${num}</div>`;
+      let html = '';
 
-    const p02 = s.s02.parrafos.map(p => `<p contenteditable="true" data-editable>${p}</p>`).join('');
-    zona.innerHTML += `
-      <div class="slide-label">Diapositiva 02 — La escena</div>
-      <div class="slide">
-        <div class="cuerpo">${p02}</div>
-        <div class="slide-num">02</div>${marca}
-      </div>`;
+      if (slide.tipo === 'portada') {
+        html = `
+          <div class="slide">
+            <div class="tag" contenteditable="true" data-editable>${slide.tag}</div>
+            <div class="titulo-grande" contenteditable="true" data-editable>${slide.titulo}</div>
+            <div class="divider"></div>
+            <div class="subtitulo" contenteditable="true" data-editable>${slide.subtitulo.replace(/\n/g,'<br>')}</div>
+            <div class="slide-num">${num}</div>${marca}
+          </div>`;
 
-    const p03outro = (s.s03.outro || []).map(p => `<p contenteditable="true" data-editable>${p}</p>`).join('');
-    const cita03 = s.s03.cita ? `<div class="cita"><div class="cita-texto" contenteditable="true" data-editable>${s.s03.cita}</div></div>` : '';
-    zona.innerHTML += `
-      <div class="slide-label">Diapositiva 03 — El giro</div>
-      <div class="slide">
-        <div class="cuerpo"><p contenteditable="true" data-editable>${s.s03.intro}</p></div>
-        ${cita03}
-        <div class="cuerpo">${p03outro}</div>
-        <div class="slide-num">03</div>${marca}
-      </div>`;
+      } else if (slide.tipo === 'cuerpo') {
+        const parrafos = (slide.parrafos || []).map(p => `<p contenteditable="true" data-editable>${p}</p>`).join('');
+        html = `
+          <div class="slide">
+            <div class="cuerpo">${parrafos}</div>
+            <div class="slide-num">${num}</div>${marca}
+          </div>`;
 
-    const p04intro = (s.s04.intro || []).map(p => `<p contenteditable="true" data-editable>${p}</p>`).join('');
-    const p04outro = (s.s04.outro || []).map(p => `<p contenteditable="true" data-editable>${p}</p>`).join('');
-    const lista04 = s.s04.lista.map(i => `<li contenteditable="true" data-editable>${i}</li>`).join('');
-    zona.innerHTML += `
-      <div class="slide-label">Diapositiva 04 — El detalle</div>
-      <div class="slide">
-        <div class="cuerpo">${p04intro}</div>
-        <ul class="lista">${lista04}</ul>
-        <div class="cuerpo">${p04outro}</div>
-        <div class="slide-num">04</div>${marca}
-      </div>`;
+      } else if (slide.tipo === 'cita') {
+        const intro = slide.intro ? `<div class="cuerpo"><p contenteditable="true" data-editable>${slide.intro}</p></div>` : '';
+        const cita = slide.cita ? `<div class="cita"><div class="cita-texto" contenteditable="true" data-editable>${slide.cita}</div></div>` : '';
+        const outro = (slide.outro || []).map(p => `<p contenteditable="true" data-editable>${p}</p>`).join('');
+        html = `
+          <div class="slide">
+            ${intro}${cita}
+            <div class="cuerpo">${outro}</div>
+            <div class="slide-num">${num}</div>${marca}
+          </div>`;
 
-    zona.innerHTML += `
-      <div class="slide-label">Diapositiva 05 — La reflexión</div>
-      <div class="slide" style="justify-content:center; align-items:flex-start;">
-        <div class="cita">
-          <div class="cita-texto" contenteditable="true" data-editable>${s.s05.cita}</div>
-        </div>
-        <div class="slide-num">05</div>${marca}
-      </div>`;
+      } else if (slide.tipo === 'lista') {
+        const intro = (slide.intro || []).map(p => `<p contenteditable="true" data-editable>${p}</p>`).join('');
+        const lista = (slide.lista || []).map(it => `<li contenteditable="true" data-editable>${it}</li>`).join('');
+        const outro = (slide.outro || []).map(p => `<p contenteditable="true" data-editable>${p}</p>`).join('');
+        html = `
+          <div class="slide">
+            <div class="cuerpo">${intro}</div>
+            <ul class="lista">${lista}</ul>
+            <div class="cuerpo">${outro}</div>
+            <div class="slide-num">${num}</div>${marca}
+          </div>`;
 
-    const ultIdx = s.s06.parrafos.length - 1;
-    const p06 = s.s06.parrafos.map((p, i) =>
-      i === ultIdx
-        ? `<p><span class="cursiva" contenteditable="true" data-editable>${p}</span></p>`
-        : `<p contenteditable="true" data-editable>${p}</p>`
-    ).join('');
-    zona.innerHTML += `
-      <div class="slide-label">Diapositiva 06 — Cierre</div>
-      <div class="slide">
-        <div class="cuerpo">${p06}</div>
-        <div class="hashtags" contenteditable="true" data-editable>${s.s06.hashtags}</div>
-        <div class="slide-num">06</div>${marca}
-      </div>`;
+      } else if (slide.tipo === 'reflexion') {
+        html = `
+          <div class="slide" style="justify-content:center; align-items:flex-start;">
+            <div class="cita">
+              <div class="cita-texto" contenteditable="true" data-editable>${slide.cita}</div>
+            </div>
+            <div class="slide-num">${num}</div>${marca}
+          </div>`;
+
+      } else if (slide.tipo === 'cierre') {
+        const ultIdx = (slide.parrafos || []).length - 1;
+        const parrafos = (slide.parrafos || []).map((p, idx) =>
+          idx === ultIdx
+            ? `<p><span class="cursiva" contenteditable="true" data-editable>${p}</span></p>`
+            : `<p contenteditable="true" data-editable>${p}</p>`
+        ).join('');
+        html = `
+          <div class="slide">
+            <div class="cuerpo">${parrafos}</div>
+            <div class="hashtags" contenteditable="true" data-editable>${slide.hashtags}</div>
+            <div class="slide-num">${num}</div>${marca}
+          </div>`;
+      }
+
+      zona.innerHTML += label + html;
+    });
 
     document.getElementById('slides-zona').scrollIntoView({ behavior: 'smooth' });
   }
-
   function limpiarNombre(texto) {
     return texto.replace(/[\n\r]/g,' ').replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ0-9 ]/g,'').trim().replace(/\s+/g,' ').substring(0,60);
   }
