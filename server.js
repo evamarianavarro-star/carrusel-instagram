@@ -33,10 +33,16 @@ const server = http.createServer((req, res) => {
         }
       };
 
-      const proxyReq = https.request(options, proxyRes => {
-        res.writeHead(proxyRes.statusCode, { 'Content-Type': 'application/json' });
-        proxyRes.pipe(res);
-      });
+    const proxyReq = https.request(options, proxyRes => {
+  let respBody = '';
+  proxyRes.on('data', chunk => respBody += chunk);
+  proxyRes.on('end', () => {
+    console.log('Anthropic status:', proxyRes.statusCode);
+    console.log('Anthropic response:', respBody.substring(0, 300));
+    res.writeHead(proxyRes.statusCode, { 'Content-Type': 'application/json' });
+    res.end(respBody);
+  });
+});
 
       proxyReq.on('error', e => {
         res.writeHead(500);
