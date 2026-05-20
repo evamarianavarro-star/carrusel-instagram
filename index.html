@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Carrusel Instagram — Amor en lo Cotidiano</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=Source+Sans+3:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fondo: #FAF7F2;
+    --dorado: #C8A97E;
+    --dorado-suave: #E0D8CC;
+    --texto-titulo: #2C2518;
+    --texto-cuerpo: #3D3326;
+    --texto-secundario: #B08A5E;
+    --serif: 'Lora', Georgia, serif;
+    --sans: 'Source Sans 3', 'Helvetica Neue', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #F0EBE3;
+    font-family: var(--sans);
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .generador {
+    background: #fff;
+    border: 1px solid var(--dorado-suave);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+    width: 560px;
+  }
+
+  .generador-titulo {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--texto-titulo);
+    margin-bottom: 6px;
+  }
+
+  .generador-sub {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--texto-secundario);
+    margin-bottom: 22px;
+    line-height: 1.5;
+  }
+
+  .campo-label {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--texto-secundario);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .campo-input {
+    width: 100%;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--texto-cuerpo);
+    background: #FAF7F2;
+    border: 1px solid var(--dorado-suave);
+    border-radius: 6px;
+    padding: 10px 14px;
+    outline: none;
+    resize: none;
+    line-height: 1.6;
+  }
+
+  .campo-input:focus { border-color: var(--dorado); }
+  #input-titulo { margin-bottom: 16px; }
+  #input-texto { min-height: 160px; margin-bottom: 20px; }
+
+  .fila-inferior {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+  }
+
+  .campo-usuario { flex: 1; }
+
+  .campo-usuario input {
+    width: 100%;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--texto-cuerpo);
+    background: #FAF7F2;
+    border: 1px solid var(--dorado-suave);
+    border-radius: 6px;
+    padding: 10px 14px;
+    outline: none;
+  }
+
+  .campo-usuario input:focus { border-color: var(--dorado); }
+
+  .btn-generar {
+    background: var(--texto-titulo);
+    color: #FAF7F2;
+    border: none;
+    border-radius: 24px;
+    padding: 11px 24px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+
+  .btn-generar:hover { background: #B08A5E; }
+  .btn-generar:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .estado-ia {
+    display: none;
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--texto-secundario);
+    margin-top: 12px;
+    letter-spacing: 0.3px;
+  }
+
+  .estado-ia.visible { display: block; }
+
+  .slide-label {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: var(--texto-secundario);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    margin-top: 40px;
+    align-self: flex-start;
+    width: 560px;
+  }
+
+  .slide {
+    width: 560px;
+    min-height: 560px;
+    background: var(--fondo);
+    border: 0.5px solid var(--dorado-suave);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 56px;
+    overflow: hidden;
+  }
+
+  .slide::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: var(--dorado);
+  }
+
+  .slide-num {
+    position: absolute;
+    bottom: 22px;
+    right: 32px;
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 3px;
+    color: var(--dorado);
+  }
+
+  .slide-marca {
+    position: absolute;
+    bottom: 22px;
+    left: 32px;
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: var(--dorado-suave);
+    text-transform: uppercase;
+  }
+
+  .tag {
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--texto-secundario);
+    margin-bottom: 22px;
+  }
+
+  .titulo-grande {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--texto-titulo);
+    line-height: 1.3;
+    margin-bottom: 24px;
+  }
+
+  .divider {
+    width: 36px;
+    height: 1px;
+    background: var(--dorado);
+    margin-bottom: 22px;
+  }
+
+  .subtitulo {
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--texto-secundario);
+    line-height: 1.7;
+    letter-spacing: 0.3px;
+  }
+
+  .cuerpo {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--texto-cuerpo);
+    line-height: 1.9;
+  }
+
+  .cuerpo p { margin-bottom: 16px; }
+  .cuerpo p:last-child { margin-bottom: 0; }
+
+  .cursiva {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--texto-titulo);
+  }
+
+  .cita {
+    border-left: 3px solid var(--dorado);
+    padding-left: 22px;
+    margin: 20px 0;
+  }
+
+  .cita-texto {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 19px;
+    color: var(--texto-titulo);
+    line-height: 1.65;
+  }
+
+  .lista { list-style: none; padding: 0; margin: 14px 0; }
+
+  .lista li {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--texto-cuerpo);
+    line-height: 1.9;
+    padding-left: 18px;
+    position: relative;
+  }
+
+  .lista li::before {
+    content: '·';
+    position: absolute;
+    left: 4px;
+    color: var(--dorado);
+    font-size: 18px;
+    line-height: 1.6;
+  }
+
+  .hashtags {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--texto-secundario);
+    letter-spacing: 0.8px;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 0.5px solid var(--dorado-suave);
+  }
+
+  [data-editable] {
+    outline: 1px dashed rgba(200, 169, 126, 0.4);
+    outline-offset: 2px;
+    cursor: text;
+  }
+
+  [data-editable]:focus {
+    outline: 2px solid var(--dorado);
+    outline-offset: 3px;
+  }
+
+  .btn-fixed {
+    position: fixed;
+    right: 24px;
+    border: none;
+    border-radius: 24px;
+    padding: 10px 20px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 300;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    z-index: 100;
+    color: #fff;
+  }
+
+  .btn-exportar { bottom: 24px; background: var(--texto-titulo); }
+  .btn-exportar:hover { background: #B08A5E; }
+
+  #progreso-wrap {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(250,247,242,0.96);
+    z-index: 200;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  #slides-zona { width: 100%; display: flex; flex-direction: column; align-items: center; }
+</style>
+</head>
+<body>
+
+<div class="generador">
+  <div class="generador-titulo">Nuevo carrusel</div>
+  <div class="generador-sub">Pega el título y el texto completo. La IA lo divide en 6 slides automáticamente.</div>
+
+  <label class="campo-label" for="input-titulo">Título del post</label>
+  <input id="input-titulo" class="campo-input" type="text" placeholder="Ej: Cuando alguien cede su asiento sin decir nada">
+
+  <label class="campo-label" for="input-texto">Texto completo</label>
+  <textarea id="input-texto" class="campo-input" placeholder="Pega aquí el texto completo del post…"></textarea>
+
+  <div class="fila-inferior">
+    <div class="campo-usuario">
+      <label class="campo-label" for="input-usuario">Tu usuario de Instagram</label>
+      <input id="input-usuario" type="text" placeholder="@tuusuario">
+    </div>
+    <button class="btn-generar" id="btnGenerar" onclick="generarSlides()">✦ Generar slides</button>
+  </div>
+
+  <div class="estado-ia" id="estadoIa">Analizando el texto y distribuyendo el contenido…</div>
+</div>
+
+<div id="slides-zona"></div>
+
+<button class="btn-fixed btn-exportar" id="btnExportar" onclick="exportarTodo()" style="display:none;">⬇ Exportar imágenes</button>
+
+<div id="progreso-wrap">
+  <div style="font-family:'Lora',serif; font-size:18px; color:#2C2518;" id="progreso-texto">Generando imágenes…</div>
+  <div style="width:240px; height:4px; background:#E0D8CC; border-radius:2px;">
+    <div id="progreso-barra" style="height:4px; background:#C8A97E; border-radius:2px; width:0%; transition:width 0.3s;"></div>
+  </div>
+  <div style="font-family:'Source Sans 3',sans-serif; font-weight:300; font-size:12px; color:#B08A5E; letter-spacing:1px;" id="progreso-num">0 / 6</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+  async function generarSlides() {
+    const titulo = document.getElementById('input-titulo').value.trim();
+    const texto = document.getElementById('input-texto').value.trim();
+    const usuario = document.getElementById('input-usuario').value.trim() || '@tuusuario';
+
+    if (!titulo || !texto) {
+      alert('Por favor, introduce el título y el texto del post.');
+      return;
+    }
+
+    const btn = document.getElementById('btnGenerar');
+    const estado = document.getElementById('estadoIa');
+    btn.disabled = true;
+    estado.classList.add('visible');
+    estado.textContent = 'Analizando el texto y distribuyendo el contenido…';
+
+    const prompt = `Eres un asistente que convierte textos reflexivos en carruseles de Instagram de 6 diapositivas.
+
+El formato de cada post sigue siempre esta estructura narrativa:
+- Slide 01 (PORTADA): título del post, categoría "Amor en lo cotidiano", y un subtítulo de 2 líneas cortas que inviten a leer.
+- Slide 02 (LA ESCENA): inicio del relato, sitúa al lector en la situación cotidiana.
+- Slide 03 (EL GIRO): el momento de sorpresa o expectativa rota. Si hay una frase entre comillas o un pensamiento, ponla como cita.
+- Slide 04 (EL DETALLE): el momento concreto y bello. Si hay una lista de elementos, mantenla como lista.
+- Slide 05 (LA REFLEXIÓN): la frase más poderosa del texto, como cita centrada. Solo esta frase, sin más texto.
+- Slide 06 (EL CIERRE): la conclusión espiritual o reflexiva, más los hashtags relevantes al tema.
+
+Título: "${titulo}"
+
+Texto completo:
+${texto}
+
+Devuelve ÚNICAMENTE un objeto JSON válido, sin markdown, sin explicaciones, con esta estructura exacta:
+{
+  "s01": { "tag": "Amor en lo cotidiano", "titulo": "...", "subtitulo": "línea 1\nlínea 2" },
+  "s02": { "parrafos": ["párrafo 1", "párrafo 2", "párrafo 3"] },
+  "s03": { "intro": "texto antes de la cita", "cita": "frase entre comillas si la hay", "outro": ["párrafo final"] },
+  "s04": { "intro": ["párrafo 1", "párrafo 2"], "lista": ["item 1", "item 2", "item 3"], "outro": ["párrafo final"] },
+  "s05": { "cita": "la frase más poderosa y breve del texto, reescrita si hace falta para máximo impacto" },
+  "s06": { "parrafos": ["párrafo 1", "párrafo 2", "párrafo 3", "frase final en cursiva"], "hashtags": "#Tag1 · #Tag2 · #Tag3" }
+}`;
+
+    try {
+      const res = await fetch('/api/generar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+
+      const data = await res.json();
+      const raw = data.content.map(b => b.text || '').join('');
+      const clean = raw.replace(/```json|```/g, '').trim();
+      const slides = JSON.parse(clean);
+
+      renderSlides(slides, titulo, usuario);
+      estado.textContent = '¡Listo! Revisa las slides y edita lo que necesites.';
+      document.getElementById('btnExportar').style.display = 'block';
+
+    } catch (e) {
+      estado.textContent = 'Algo fue mal. Inténtalo de nuevo.';
+      console.error(e);
+    }
+
+    btn.disabled = false;
+  }
+
+  function renderSlides(s, titulo, usuario) {
+    const zona = document.getElementById('slides-zona');
+    zona.innerHTML = '';
+    const marca = `<div class="slide-marca">${usuario}</div>`;
+
+    zona.innerHTML += `
+      <div class="slide-label">Diapositiva 01 — Portada</div>
+      <div class="slide">
+        <div class="tag" contenteditable="true" data-editable>${s.s01.tag}</div>
+        <div class="titulo-grande" contenteditable="true" data-editable>${s.s01.titulo}</div>
+        <div class="divider"></div>
+        <div class="subtitulo" contenteditable="true" data-editable>${s.s01.subtitulo.replace(/\n/g,'<br>')}</div>
+        <div class="slide-num">01</div>${marca}
+      </div>`;
+
+    const p02 = s.s02.parrafos.map(p => `<p contenteditable="true" data-editable>${p}</p>`).join('');
+    zona.innerHTML += `
+      <div class="slide-label">Diapositiva 02 — La escena</div>
+      <div class="slide">
+        <div class="cuerpo">${p02}</div>
+        <div class="slide-num">02</div>${marca}
+      </div>`;
+
+    const p03outro = (s.s03.outro || []).map(p => `<p contenteditable="true" data-editable>${p}</p>`).join('');
+    const cita03 = s.s03.cita ? `<div class="cita"><div class="cita-texto" contenteditable="true" data-editable>${s.s03.cita}</div></div>` : '';
+    zona.innerHTML += `
+      <div class="slide-label">Diapositiva 03 — El giro</div>
+      <div class="slide">
+        <div class="cuerpo"><p contenteditable="true" data-editable>${s.s03.intro}</p></div>
+        ${cita03}
+        <div class="cuerpo">${p03outro}</div>
+        <div class="slide-num">03</div>${marca}
+      </div>`;
+
+    const p04intro = (s.s04.intro || []).map(p => `<p contenteditable="true" data-editable>${p}</p>`).join('');
+    const p04outro = (s.s04.outro || []).map(p => `<p contenteditable="true" data-editable>${p}</p>`).join('');
+    const lista04 = s.s04.lista.map(i => `<li contenteditable="true" data-editable>${i}</li>`).join('');
+    zona.innerHTML += `
+      <div class="slide-label">Diapositiva 04 — El detalle</div>
+      <div class="slide">
+        <div class="cuerpo">${p04intro}</div>
+        <ul class="lista">${lista04}</ul>
+        <div class="cuerpo">${p04outro}</div>
+        <div class="slide-num">04</div>${marca}
+      </div>`;
+
+    zona.innerHTML += `
+      <div class="slide-label">Diapositiva 05 — La reflexión</div>
+      <div class="slide" style="justify-content:center; align-items:flex-start;">
+        <div class="cita">
+          <div class="cita-texto" contenteditable="true" data-editable>${s.s05.cita}</div>
+        </div>
+        <div class="slide-num">05</div>${marca}
+      </div>`;
+
+    const ultIdx = s.s06.parrafos.length - 1;
+    const p06 = s.s06.parrafos.map((p, i) =>
+      i === ultIdx
+        ? `<p><span class="cursiva" contenteditable="true" data-editable>${p}</span></p>`
+        : `<p contenteditable="true" data-editable>${p}</p>`
+    ).join('');
+    zona.innerHTML += `
+      <div class="slide-label">Diapositiva 06 — Cierre</div>
+      <div class="slide">
+        <div class="cuerpo">${p06}</div>
+        <div class="hashtags" contenteditable="true" data-editable>${s.s06.hashtags}</div>
+        <div class="slide-num">06</div>${marca}
+      </div>`;
+
+    document.getElementById('slides-zona').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function limpiarNombre(texto) {
+    return texto.replace(/[\n\r]/g,' ').replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ0-9 ]/g,'').trim().replace(/\s+/g,' ').substring(0,60);
+  }
+
+  async function exportarTodo() {
+    const slides = document.querySelectorAll('.slide');
+    const titulo = document.querySelector('.titulo-grande');
+    const tituloTexto = titulo ? limpiarNombre(titulo.innerText) : 'post';
+    const wrap = document.getElementById('progreso-wrap');
+    const barra = document.getElementById('progreso-barra');
+    const num = document.getElementById('progreso-num');
+    const texto = document.getElementById('progreso-texto');
+
+    wrap.style.display = 'flex';
+    document.querySelectorAll('[data-editable]').forEach(el => el.style.outline = 'none');
+    document.activeElement && document.activeElement.blur();
+
+    for (let i = 0; i < slides.length; i++) {
+      const numSlide = String(i+1).padStart(2,'0');
+      texto.textContent = 'Generando slide ' + numSlide + '…';
+      num.textContent = i + ' / ' + slides.length;
+      barra.style.width = ((i / slides.length) * 100) + '%';
+      await new Promise(r => setTimeout(r, 80));
+
+      const canvas = await html2canvas(slides[i], { scale:2, useCORS:true, backgroundColor:'#FAF7F2', logging:false });
+      const link = document.createElement('a');
+      link.download = tituloTexto + '_' + numSlide + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      await new Promise(r => setTimeout(r, 500));
+    }
+
+    barra.style.width = '100%';
+    num.textContent = slides.length + ' / ' + slides.length;
+    texto.textContent = '¡Listo! Revisa tu carpeta de Descargas.';
+    await new Promise(r => setTimeout(r, 2000));
+    wrap.style.display = 'none';
+    document.querySelectorAll('[data-editable]').forEach(el => el.style.outline = '');
+  }
+</script>
+</body>
+</html>
