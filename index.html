@@ -436,7 +436,7 @@ Devuelve ÚNICAMENTE un objeto JSON válido, sin markdown, sin explicaciones, co
 
       const data = await res.json();
       const raw = data.content.map(b => b.text || '').join('');
-      const clean = raw.replace(/```json|```/g, '').trim();
+      const clean = raw.replace(/```json\n?|```\n?/g, '').trim();
       const slides = JSON.parse(clean);
 
       renderSlides(slides, titulo, usuario);
